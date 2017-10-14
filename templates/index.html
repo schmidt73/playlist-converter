@@ -16,10 +16,10 @@
         <paper-material id="input-box">
             <div id="login-text">Google Play Music Login</div>
 
-            <paper-input label="username">
+            <paper-input id="userinput" label="username">
             </paper-input>
 
-            <paper-input label="password">
+            <paper-input id="passinput" label="password">
             </paper-input>
 
             <paper-button onclick="login()">
@@ -30,7 +30,31 @@
 
     <script>
         function login(){
-            alert("Hello"); 
+            username = document.querySelector("#userinput").value;
+            password = document.querySelector("#passinput").value;
+            post("/convert", {"user": username, "pass": password});
+        }
+
+        function post(path, params, method) {
+            method = method || "post"; 
+
+            var form = document.createElement("form");
+            form.setAttribute("method", method);
+            form.setAttribute("action", path);
+
+            for(var key in params) {
+                if(params.hasOwnProperty(key)) {
+                    var hiddenField = document.createElement("input");
+                    hiddenField.setAttribute("type", "hidden");
+                    hiddenField.setAttribute("name", key);
+                    hiddenField.setAttribute("value", params[key]);
+
+                    form.appendChild(hiddenField);
+                 }
+            }
+
+            document.body.appendChild(form);
+            form.submit();
         }
     </script>
 </html>

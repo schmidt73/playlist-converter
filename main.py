@@ -60,9 +60,15 @@ def authenticationCallback():
     # expires_in = response_data["expires_in"]
     return redirect("http://www.google.com");
 
-@app.route("/convert")
+@app.route("/convert", methods = ["POST"])
 def convertPlaylist():
-    pass
+    data = request.form
+    user = data['user']
+    passwd = data['pass']
+
+    print (user + passwd)
+    return redirect("http://www.google.com");
+
 
 @app.route("/")
 def index():
