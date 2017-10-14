@@ -1,5 +1,7 @@
+from flask import Flask, request, redirect, g, render_template, make_response, url_for
+from gmusicapi import Mobileclient
+
 import json
-from flask import Flask, request, redirect, g, render_template
 import requests
 import base64
 import urllib
@@ -33,6 +35,69 @@ auth_query_parameters = {
     "client_id": CLIENT_ID
 }
 
+def get_gmusic_playlists(username, password):
+    api = Mobileclient()
+    logged_in = api.login(username, password, Mobileclient.FROM_MAC_ADDRESS)
+    
+    if not logged_in:
+        print ("Login failed.")
+
+    if api.is_authenticated() :
+        playlists = api.get_all_user_playlist_contents()
+
+        output_dict = {}
+        for playlist in playlists:
+            name = playlist["name"]
+            tracks = playlist["tracks"]
+
+            for track in tracks:
+                track = track["track"]
+                artist = track["artist"]
+                title = track["title"]
+
+                if name in output_dict:
+                    output_dict[name].append((artist, title))
+                else:
+                    output_dict[name] = [(artist, title)]
+                        
+        return output_dict
+
+    return None
+
+def build_header(access_token):
+    return {"Authorization":"Bearer {}".format(access_token)}
+
+def get_user_id(access_token):
+    header = build_header(access_token)
+    get_request = requests.get(SPOTIFY_API_URL + "/me", headers=header)
+    return json.loads(get_request.text)["id"]
+
+def create_playlist(access_token, playlist_name, user_id):
+    header = build_header(access_token)
+    body = {"name" : playlist_name}
+    query = "/users/{}/playlists".format(user_id)
+    response = requests.post(SPOTIFY_API_URL + query, data=json.dumps(body), headers=header)
+    return json.loads(response.text)["id"]
+
+def add_to_playlist(access_token, playlist_id, user_id, tracks):
+    if tracks == []:
+        return
+
+    header = build_header(access_token)
+    body = {"uris": tracks}
+    query = "/users/{}/playlists/{}/tracks".format(user_id, playlist_id)
+    response = requests.post(SPOTIFY_API_URL + query, data=json.dumps(body), headers=header)
+
+def search_track(access_token, track):
+    header = build_header(access_token)
+    query = "/search?q={}&type=track&limit=1".format(urllib.quote(track))
+    response = requests.get(SPOTIFY_API_URL + query, headers=header)
+    tracks = json.loads(response.text)["tracks"]
+
+    if tracks["items"] == []:
+        return None
+    return tracks["items"][0]["uri"]
+
 @app.route("/spotifyAuthorize")
 def authorize():
     url_args = "&".join(["{}={}".format(key,urllib.quote(val)) for key,val in auth_query_parameters.iteritems()])
@@ -40,7 +105,7 @@ def authorize():
     return redirect(auth_url)
 
 @app.route("/spotifyAuthCallback")
-def authenticationCallback():
+def authentication_callback():
     auth_token = request.args['code']
     code_payload = {
         "grant_type": "authorization_code",
@@ -53,22 +118,41 @@ def authenticationCallback():
     post_request = requests.post(SPOTIFY_TOKEN_URL, data=code_payload, headers=headers)
 
     response_data = json.loads(post_request.text)
-    print response_data
-    # access_token = response_data["access_token"]
-    # refresh_token = response_data["refresh_token"]
-    # token_type = response_data["token_type"]
-    # expires_in = response_data["expires_in"]
-    return redirect("http://www.google.com");
+    access_token = response_data["access_token"]
+    refresh_token = response_data["refresh_token"]
+    token_type = response_data["token_type"]
+    expires_in = response_data["expires_in"]
+
+    guser = request.cookies.get("user")
+    gpass = request.cookies.get("pass")
+
+    playlists = get_gmusic_playlists(guser, gpass)
+    if playlists is None:
+        print "failed to load playlists"
+
+    user_id = get_user_id(access_token)
+    for plist_name, tracks in playlists.items():
+        plist_id = create_playlist(access_token, plist_name, user_id)
+        track_uris = []
+        for (artist, track) in tracks:
+            trackURI = search_track(access_token, track)
+            if trackURI is not None:
+                print trackURI
+                track_uris.append(trackURI)
+        add_to_playlist(access_token, plist_id, user_id, track_uris)
+
+
+    return redirect(url_for("index"))
 
 @app.route("/convert", methods = ["POST"])
-def convertPlaylist():
-    data = request.form
-    user = data['user']
-    passwd = data['pass']
+def convert_playlist():
+    user = request.form['user']
+    passwd = request.form['pass']
 
-    print (user + passwd)
-    return redirect("http://www.google.com");
-
+    resp = make_response(redirect(url_for('authorize')))
+    resp.set_cookie("user", user)
+    resp.set_cookie("pass", passwd)
+    return resp
 
 @app.route("/")
 def index():
