@@ -3,12 +3,27 @@
 #login-text {
     font-family: 'Roboto', sans-serif;
     font-size: 24px;
+    text-align: center;
+
+    margin: auto;
+    padding-top: 20px;
+    color: white;
 }
 
 #input-box {
-    margin: 25%;
-    width: 50%;
-    height: 30%;
+    margin: auto;
+    
+    margin-top: 15%;
+
+    width: 400px;
+    height: 250px;
+    background-color: #84bd00;
+}
+
+#loginbutton {
+    margin-left: 27%;
+    margin-top: 20px;
+    background-color: #ecebe8;
 }
 
 paper-input {
@@ -16,4 +31,15 @@ paper-input {
     font-size: 12px;
     width: 80%;
     margin-left: 10%;
+    color: white;
+
+    --paper-input-container-color: white;
+    --paper-input-container-focus-color: white;
+    --paper-input-container-invalid-color: white;
+    --paper-input-container-input-color: white;
+}
+
+body {
+    background-color: #828282;
+    background: url("/static/images/skeleton.gif");
 }

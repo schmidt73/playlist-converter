@@ -37,6 +37,7 @@ auth_query_parameters = {
 
 def get_gmusic_playlists(username, password):
     api = Mobileclient()
+    print (username + ":" + password)
     logged_in = api.login(username, password, Mobileclient.FROM_MAC_ADDRESS)
     
     if not logged_in:
@@ -90,7 +91,8 @@ def add_to_playlist(access_token, playlist_id, user_id, tracks):
 
 def search_track(access_token, track):
     header = build_header(access_token)
-    query = "/search?q={}&type=track&limit=1".format(urllib.quote(track))
+    print track
+    query = "/search?q={}&type=track&limit=1".format(urllib.quote(track.encode("utf8")))
     response = requests.get(SPOTIFY_API_URL + query, headers=header)
     tracks = json.loads(response.text)["tracks"]
 
@@ -106,6 +108,9 @@ def authorize():
 
 @app.route("/spotifyAuthCallback")
 def authentication_callback():
+    if "user" not in request.cookies or "pass" not in request.cookies:
+        return redirect(url_for("index"))
+
     auth_token = request.args['code']
     code_payload = {
         "grant_type": "authorization_code",
@@ -128,7 +133,7 @@ def authentication_callback():
 
     playlists = get_gmusic_playlists(guser, gpass)
     if playlists is None:
-        print "failed to load playlists"
+        return redirect(url_for("index"))
 
     user_id = get_user_id(access_token)
     for plist_name, tracks in playlists.items():
@@ -137,12 +142,10 @@ def authentication_callback():
         for (artist, track) in tracks:
             trackURI = search_track(access_token, track)
             if trackURI is not None:
-                print trackURI
                 track_uris.append(trackURI)
         add_to_playlist(access_token, plist_id, user_id, track_uris)
 
-
-    return redirect(url_for("index"))
+    return redirect(url_for("success"))
 
 @app.route("/convert", methods = ["POST"])
 def convert_playlist():
@@ -154,9 +157,13 @@ def convert_playlist():
     resp.set_cookie("pass", passwd)
     return resp
 
+@app.route("/success")
+def success():
+    return render_template("index.html", success=True)
+
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", success=False)
 
 if __name__ == "__main__":
     app.run(debug=True, port=PORT)

@@ -8,6 +8,7 @@
         <link rel="import" href="/static/bower_components/paper-input/paper-input.html">
         <link rel="import" href="/static/bower_components/paper-material/paper-material.html">
         <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+        <link rel="import" href="/static/bower_components/paper-toast/paper-toast.html">
 
         <link rel="stylesheet" href="/static/css/style.css">
     </head>
@@ -16,16 +17,21 @@
         <paper-material id="input-box">
             <div id="login-text">Google Play Music Login</div>
 
-            <paper-input id="userinput" label="username">
+            <paper-input id="userinput" label="email">
             </paper-input>
 
             <paper-input id="passinput" label="password" type="password">
             </paper-input>
 
-            <paper-button onclick="login()">
-            Convert
+            <paper-button id="loginbutton" onclick="login()">
+            Convert To Spotify
             </paper-button>
+
         </paper-material>
+
+        {% if success %}
+        <paper-toast id="toast" text="Successfully created playlists!" opened></paper-toast>
+        {% endif %}
     </body>
 
     <script>
