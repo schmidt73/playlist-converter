@@ -10,7 +10,7 @@ class TokenFactory {
 
 	public static String masterKid = "43L5TK9F24";
 	public static String alg = "ES256";
-	publi static String masterIss = "SX2RLAM34X";
+	public static String masterIss = "SX2RLAM34X";
 
 	public static void balls()
 	{
@@ -28,7 +28,7 @@ class TokenFactory {
 
 	}
 
-	String void createAndSign(DevToken devToken)
+	public static String createAndSign(DevToken devToken)
 	{
 		try {
 			Algorithm alg = Algorithm.ECDSA256(devToken.getKid());
