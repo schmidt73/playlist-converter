@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <title>Playlist Converter</title>
+        <script src="/static/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+
+        <link rel="import" href="/static/bower_components/polymer/polymer.html">
+        <link rel="import" href="/static/bower_components/paper-toolbar/paper-toolbar.html">
+        <link rel="import" href="/static/bower_components/paper-input/paper-input.html">
+        <link rel="import" href="/static/bower_components/paper-material/paper-material.html">
+        <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+
+        <link rel="stylesheet" href="/static/css/style.css">
+    </head>
+
+    <body>
+        <paper-material id="input-box">
+            <div id="login-text">Google Play Music Login</div>
+
+            <paper-input label="username">
+            </paper-input>
+
+            <paper-input label="password">
+            </paper-input>
+
+            <paper-button onclick="login()">
+            Convert Playlists
+            </paper-button>
+        </paper-material>
+    </body>
+
+    <script>
+        function login(){
+            alert("Hello"); 
+        }
+    </script>
+</html>

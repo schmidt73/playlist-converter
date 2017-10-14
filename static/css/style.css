@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+#login-text {
+    font-family: 'Roboto', sans-serif;
+    font-size: 24px;
+}
+
+#input-box {
+    margin: 25%;
+    width: 50%;
+    height: 30%;
+}
+
+paper-input {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    width: 80%;
+    margin-left: 10%;
+}

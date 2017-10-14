@@ -1,7 +1,0 @@
-#!/bin/bash
-
-NAME=playlist-converter
-RUNTARGET=com.dhdh.app.App
-VERSION=1.0
-
-java -cp target/${NAME}-${VERSION}.jar:"target/dependency/*" ${RUNTARGET}
