@@ -5,11 +5,11 @@ import java.util.Map;
 
 import java.net.URLEncoder;
 
-public class SpotifyCredentials {
-    final String AUTH_URL = "https://accounts.spotify.com/authorize";
-    final String TOKEN_URL = "https://accounts.spotify.com/api/token";
-    final String API_BASE_URL = "https://api.spotify.com";
-    final String API_VERSION = "v1";
+public class Credentials {
+    public static final String AUTH_URL = "https://accounts.spotify.com/authorize";
+    public static final String TOKEN_URL = "https://accounts.spotify.com/api/token";
+    public static final String API_BASE_URL = "https://api.spotify.com";
+    public static final String API_VERSION = "v1";
 
     public String clientID;
     public String secretID;
@@ -17,8 +17,8 @@ public class SpotifyCredentials {
 
     public String redirectURL;
 
-    public SpotifyCredentials(String clientID, String secretID, 
-                              String scope, String redirectURL)
+    public Credentials(String clientID, String secretID, 
+                       String scope, String redirectURL)
     {
         this.clientID = clientID;
         this.secretID = secretID;
@@ -41,4 +41,17 @@ public class SpotifyCredentials {
 
         return AUTH_URL + "/?" + urlArgs;
     }
+
+    public String buildEncodedAuth()
+    {
+        return base64Encode(clientID + ":" + secretID);
+    }
+
+    private static String base64Encode(String str)
+    {
+        Base64.Encoder encoder = Base64.getEncoder();
+        return encoder.encode(str.getBytes());
+    }
+
+
 }
