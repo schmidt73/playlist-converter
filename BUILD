@@ -1,3 +1,3 @@
 #!/bin/bash
 
-mvn -e package
+mvn -X package
